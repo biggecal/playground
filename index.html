@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NCAA Baseball Scoreboard</title>
+  <title>BIGGE NCAA MARCH MADNESS SCOREBOARD</title>
   <style>
     :root {
       --bg: #0a0e1a;
@@ -432,8 +432,14 @@
     }
 
     .upcoming-team {
-      font-size: clamp(11px, 1.1vw, 18px);
+      font-size: clamp(12px, 1.25vw, 20px);
       font-weight: 600;
+    }
+
+    #upcoming-panel .seed-badge {
+      min-width: clamp(16px, 1.65vw, 26px);
+      height: clamp(16px, 1.65vw, 26px);
+      font-size: clamp(8px, 0.78vw, 13px);
     }
 
     .upcoming-vs {
@@ -447,6 +453,29 @@
       font-size: clamp(8px, 0.75vw, 13px);
       color: var(--muted);
       text-align: right;
+    }
+
+    .upcoming-odds {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.2vh;
+      border-left: 1px solid var(--border);
+      padding-left: 0.8vw;
+    }
+
+    .upcoming-spread {
+      font-size: clamp(10px, 1vw, 17px);
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .upcoming-ou {
+      font-size: clamp(8px, 0.8vw, 13px);
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
     }
 
     /* Summary panel */
@@ -648,24 +677,24 @@
         </div>
       </div>
 
-      <!-- TOP-RIGHT: Final Scores -->
-      <div class="panel">
-        <div class="panel-header">
-          <span class="panel-title">Final Scores</span>
-          <span class="count-badge" id="final-count">0</span>
-        </div>
-        <div class="panel-body" id="final-panel">
-          <div class="loading"><div class="spinner"></div><span>Loading...</span></div>
-        </div>
-      </div>
-
-      <!-- BOTTOM-RIGHT: Upcoming Games -->
+      <!-- TOP-RIGHT: Upcoming Games -->
       <div class="panel">
         <div class="panel-header">
           <span class="panel-title">Upcoming Games</span>
           <span class="count-badge" id="upcoming-count">0</span>
         </div>
         <div class="panel-body" id="upcoming-panel">
+          <div class="loading"><div class="spinner"></div><span>Loading...</span></div>
+        </div>
+      </div>
+
+      <!-- BOTTOM-RIGHT: Final Scores -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Final Scores</span>
+          <span class="count-badge" id="final-count">0</span>
+        </div>
+        <div class="panel-body" id="final-panel">
           <div class="loading"><div class="spinner"></div><span>Loading...</span></div>
         </div>
       </div>
@@ -742,6 +771,7 @@ function buildGameCard(event, group) {
   const comp = event.competitions[0];
   const home = getCompetitor(comp, 'home');
   const away = getCompetitor(comp, 'away');
+  if (group === 'live') console.log('ODDS DEBUG', away.team?.abbreviation, '@', home.team?.abbreviation, comp.odds);
   const status = comp.status;
   const statusType = status?.type?.name || '';
   const statusDetail = status?.type?.shortDetail || status?.type?.detail || '';
@@ -953,7 +983,27 @@ function buildUpcomingCard(event, isTomorrow) {
 
   card.appendChild(matchup);
 
-  if (venue) {
+  const oddsInfo = comp.odds?.[0];
+  const spread = oddsInfo?.details || '';
+  const overUnder = oddsInfo?.overUnder;
+
+  if (spread || overUnder != null) {
+    const oddsDiv = document.createElement('div');
+    oddsDiv.className = 'upcoming-odds';
+    if (spread) {
+      const spreadEl = document.createElement('div');
+      spreadEl.className = 'upcoming-spread';
+      spreadEl.textContent = spread;
+      oddsDiv.appendChild(spreadEl);
+    }
+    if (overUnder != null) {
+      const ouEl = document.createElement('div');
+      ouEl.className = 'upcoming-ou';
+      ouEl.textContent = `O/U ${overUnder % 1 === 0 ? overUnder + '.0' : overUnder}`;
+      oddsDiv.appendChild(ouEl);
+    }
+    card.appendChild(oddsDiv);
+  } else if (venue) {
     const v = document.createElement('div');
     v.className = 'upcoming-venue';
     v.textContent = venue;
@@ -966,7 +1016,7 @@ function buildUpcomingCard(event, isTomorrow) {
 
 // ── Preview: 5 earliest tomorrow games shown as live ───────────────────────
 
-const PREVIEW_LIVE = true;
+const PREVIEW_LIVE = false;
 
 function mockTeam(shortName, abbrev) {
   return { shortDisplayName: shortName, displayName: shortName, abbreviation: abbrev, logos: [] };
@@ -1152,7 +1202,7 @@ function resetScrollers() {
 fetchScores();
 updateClock();
 requestAnimationFrame(tickScroll);
-setInterval(async () => { await fetchScores(); resetScrollers(); }, 60_000);
+setInterval(async () => { await fetchScores(); resetScrollers(); }, 10_000);
 setInterval(updateClock, 1_000);
 </script>
 </body>
