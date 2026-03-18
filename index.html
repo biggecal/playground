@@ -676,13 +676,6 @@ function buildGameCard(event, group) {
     nameEl.textContent = competitor.team?.shortDisplayName || competitor.team?.displayName || 'TBD';
     row.appendChild(nameEl);
 
-    const rec = competitor.records?.[0]?.summary || '';
-    if (rec) {
-      const recEl = document.createElement('span');
-      recEl.className = 'team-record';
-      recEl.textContent = rec;
-      row.appendChild(recEl);
-    }
     return row;
   }
 
@@ -729,6 +722,13 @@ function buildGameCard(event, group) {
   statusLabel.textContent = group === 'live' ? statusDetail || 'LIVE' : group === 'final' ? 'FINAL' : 'TODAY';
   statusDiv.appendChild(statusLabel);
 
+  if (group === 'final') {
+    const dateEl = document.createElement('div');
+    dateEl.className = 'status-detail';
+    dateEl.textContent = new Date(event.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
+    statusDiv.appendChild(dateEl);
+  }
+
   if (group === 'live' && status?.period) {
     const per = document.createElement('div');
     per.className = 'status-detail';
@@ -751,9 +751,12 @@ function buildUpcomingCard(event, isTomorrow) {
   const card = document.createElement('div');
   card.className = 'upcoming-card';
 
+  const gameDate = new Date(event.date);
+  const dateLabel = gameDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
+
   const timeDiv = document.createElement('div');
   timeDiv.className = 'upcoming-time';
-  timeDiv.innerHTML = `<span class="time">${time}</span><span class="ampm">${isTomorrow ? 'TMW' : ampm}</span>`;
+  timeDiv.innerHTML = `<span class="time">${time}</span><span class="ampm" style="font-size:clamp(6px,0.6vw,10px);color:var(--muted)">${dateLabel}</span>`;
   card.appendChild(timeDiv);
 
   function seedBadge(competitor) {
@@ -789,12 +792,6 @@ function buildUpcomingCard(event, isTomorrow) {
   teamLine.appendChild(homeNameSpan);
   matchup.appendChild(teamLine);
 
-  if (away.records?.[0]?.summary || home.records?.[0]?.summary) {
-    const rec = document.createElement('div');
-    rec.className = 'upcoming-vs';
-    rec.textContent = `${away.records?.[0]?.summary || ''} · ${home.records?.[0]?.summary || ''}`;
-    matchup.appendChild(rec);
-  }
   card.appendChild(matchup);
 
   if (venue) {
