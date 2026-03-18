@@ -348,6 +348,21 @@
       letter-spacing: -0.02em;
     }
 
+    .status-ou {
+      font-size: clamp(7px, 0.7vw, 12px);
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+
+    .team-spread {
+      font-size: clamp(8px, 0.75vw, 13px);
+      font-weight: 700;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
     /* Stat strip (H/E) */
     .stat-strip {
       display: flex;
@@ -595,6 +610,13 @@
     #live-panel .status-clock {
       font-size: clamp(20px, 2.6vw, 46px);
     }
+    #live-panel .status-ou {
+      font-size: clamp(11px, 1.15vw, 19px);
+      margin-top: 0.3vh;
+    }
+    #live-panel .team-spread {
+      font-size: clamp(13px, 1.6vw, 26px);
+    }
   </style>
 </head>
 <body>
@@ -738,7 +760,27 @@ function buildGameCard(event, group) {
   const homeWins = isFinal && homeScore > awayScore;
   const awayWins = isFinal && awayScore > homeScore;
 
-  function teamRow(competitor, wins, loses) {
+  // Parse spread from odds details, e.g. "Auburn -22.5"
+  let awaySpread = null, homeSpread = null;
+  if (isLive) {
+    const oddsDetails = comp.odds?.[0]?.details || '';
+    const m = oddsDetails.match(/^(.+?)\s+([+-]?\d+\.?\d*)$/);
+    if (m) {
+      const favoredFragment = m[1].trim().toLowerCase();
+      const spreadVal = parseFloat(m[2]);
+      const awayName = (away.team?.shortDisplayName || '').toLowerCase();
+      const awayFavored = awayName && favoredFragment.includes(awayName.split(' ')[0]);
+      if (awayFavored) {
+        awaySpread = m[2];
+        homeSpread = spreadVal < 0 ? `+${Math.abs(spreadVal)}` : `-${spreadVal}`;
+      } else {
+        homeSpread = m[2];
+        awaySpread = spreadVal < 0 ? `+${Math.abs(spreadVal)}` : `-${spreadVal}`;
+      }
+    }
+  }
+
+  function teamRow(competitor, wins, loses, spread) {
     const row = document.createElement('div');
     row.className = `team-row${wins ? ' team-winner' : ''}`;
     row.appendChild(logoEl(competitor.team || {}));
@@ -756,13 +798,20 @@ function buildGameCard(event, group) {
     nameEl.textContent = competitor.team?.shortDisplayName || competitor.team?.displayName || 'TBD';
     row.appendChild(nameEl);
 
+    if (spread != null) {
+      const spreadEl = document.createElement('span');
+      spreadEl.className = 'team-spread';
+      spreadEl.textContent = spread;
+      row.appendChild(spreadEl);
+    }
+
     return row;
   }
 
   const teamsDiv = document.createElement('div');
   teamsDiv.className = 'game-teams';
-  teamsDiv.appendChild(teamRow(away, awayWins, !awayWins && isFinal));
-  teamsDiv.appendChild(teamRow(home, homeWins, !homeWins && isFinal));
+  teamsDiv.appendChild(teamRow(away, awayWins, !awayWins && isFinal, awaySpread));
+  teamsDiv.appendChild(teamRow(home, homeWins, !homeWins && isFinal, homeSpread));
 
   // Venue strip
   if (venue) {
@@ -822,6 +871,13 @@ function buildGameCard(event, group) {
       clockEl.className = 'status-clock';
       clockEl.textContent = clock;
       statusDiv.appendChild(clockEl);
+    }
+    const overUnder = comp.odds?.[0]?.overUnder;
+    if (overUnder != null) {
+      const ouEl = document.createElement('div');
+      ouEl.className = 'status-ou';
+      ouEl.textContent = `O/U ${overUnder % 1 === 0 ? overUnder + '.0' : overUnder}`;
+      statusDiv.appendChild(ouEl);
     }
   } else if (group === 'final') {
     const lbl = document.createElement('div');
@@ -918,7 +974,7 @@ function mockTeam(shortName, abbrev) {
 
 function mockComp(awayName, awayAbbr, awaySeed, awayScore,
                   homeName, homeAbbr, homeSeed, homeScore,
-                  detail, period, venue, city) {
+                  detail, period, venue, city, overUnder, oddsDetails) {
   return {
     date: '',
     competitions: [{
@@ -928,16 +984,17 @@ function mockComp(awayName, awayAbbr, awaySeed, awayScore,
       ],
       status: { type: { name: 'STATUS_IN_PROGRESS', shortDetail: detail }, period },
       venue: { fullName: venue, address: { city } },
+      odds: overUnder != null ? [{ overUnder, details: oddsDetails || '' }] : [],
     }],
   };
 }
 
 const MOCK_LIVE_GAMES = [
-  mockComp('Auburn',    'AUB',  1,  58, 'Montana St',   'MTST', 16, 34, '2nd - 14:32', 2, 'PPG Paints Arena',    'Pittsburgh, PA'),
-  mockComp('Tennessee', 'TENN', 2,  47, 'Cleveland St',  'CSU', 15, 29, '2nd - 11:08', 2, 'Gainbridge Fieldhouse','Indianapolis, IN'),
-  mockComp('Gonzaga',   'GONZ', 8,  38, 'Memphis',       'MEM',  9, 41, 'Half',         1, 'Lenovo Center',       'Raleigh, NC'),
-  mockComp('Oregon',    'ORE',  5,  33, 'Liberty',       'LIB', 12, 28, '1st - 3:47',   1, 'Heritage Bank Center','Cincinnati, OH'),
-  mockComp('Kansas',    'KAN',  4,  21, 'UCF',           'UCF', 13, 17, '1st - 12:15',  1, 'Fiserv Forum',        'Milwaukee, WI'),
+  mockComp('Auburn',    'AUB',  1,  58, 'Montana St',   'MTST', 16, 34, '2nd - 14:32', 2, 'PPG Paints Arena',     'Pittsburgh, PA',    148.5, 'Auburn -22.5'),
+  mockComp('Tennessee', 'TENN', 2,  47, 'Cleveland St',  'CSU', 15, 29, '2nd - 11:08', 2, 'Gainbridge Fieldhouse','Indianapolis, IN',  132.0, 'Tennessee -17.5'),
+  mockComp('Gonzaga',   'GONZ', 8,  38, 'Memphis',       'MEM',  9, 41, 'Half',         1, 'Lenovo Center',        'Raleigh, NC',       155.5, 'Memphis -2.5'),
+  mockComp('Oregon',    'ORE',  5,  33, 'Liberty',       'LIB', 12, 28, '1st - 3:47',   1, 'Heritage Bank Center', 'Cincinnati, OH',    141.0, 'Oregon -6.5'),
+  mockComp('Kansas',    'KAN',  4,  21, 'UCF',           'UCF', 13, 17, '1st - 12:15',  1, 'Fiserv Forum',         'Milwaukee, WI',     144.5, 'Kansas -5.5'),
 ];
 
 // ── Render ─────────────────────────────────────────────────────────────────
