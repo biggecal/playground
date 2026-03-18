@@ -193,19 +193,20 @@
       border-radius: 0.5vw;
       padding: 0.9vh 1.2vw;
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
       gap: 0.5vw;
       transition: border-color 0.2s;
       flex-shrink: 0;
     }
 
     .game-card.live {
-      border-color: rgba(239, 68, 68, 0.5);
-      background: linear-gradient(135deg, #1a1010 0%, var(--surface) 100%);
+      border-color: rgba(239, 68, 68, 0.4);
+      background: linear-gradient(135deg, #180d0d 0%, var(--surface) 60%);
     }
 
     .game-card.final {
-      opacity: 0.75;
+      opacity: 0.7;
     }
 
     .game-teams {
@@ -282,8 +283,10 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      justify-content: space-between;
+      justify-content: center;
       gap: 0.35vh;
+      border-right: 1px solid var(--border);
+      padding-right: 0.8vw;
     }
 
     .score {
@@ -300,20 +303,19 @@
     .game-status {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
-      padding-left: 0.8vw;
-      border-left: 1px solid var(--border);
-      min-width: 4.5vw;
-      gap: 0.3vh;
+      padding-left: 0.6vw;
+      min-width: 5vw;
+      gap: 0.15vh;
     }
 
     .status-label {
       font-size: clamp(8px, 0.75vw, 13px);
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      text-align: right;
+      letter-spacing: 0.06em;
+      text-align: center;
     }
 
     .status-label.live { color: var(--live); }
@@ -323,7 +325,27 @@
     .status-detail {
       font-size: clamp(7px, 0.65vw, 11px);
       color: var(--muted);
-      text-align: right;
+      text-align: center;
+    }
+
+    /* Live timer — period + clock */
+    .status-period {
+      font-size: clamp(8px, 0.7vw, 12px);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--live);
+      text-align: center;
+      line-height: 1;
+    }
+
+    .status-clock {
+      font-size: clamp(14px, 1.7vw, 30px);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
     }
 
     /* Stat strip (H/E) */
@@ -358,7 +380,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 0.5vw;
-      padding: 0.75vh 1.2vw;
+      padding: 0.9vh 1.2vw;
       display: grid;
       grid-template-columns: auto 1fr auto;
       align-items: center;
@@ -371,37 +393,43 @@
       flex-direction: column;
       align-items: center;
       min-width: 4.5vw;
+      border-right: 1px solid var(--border);
+      padding-right: 0.8vw;
     }
 
     .upcoming-time .time {
-      font-size: clamp(11px, 1.1vw, 18px);
+      font-size: clamp(13px, 1.35vw, 22px);
       font-weight: 800;
       color: var(--accent2);
+      line-height: 1.1;
     }
 
     .upcoming-time .ampm {
-      font-size: clamp(7px, 0.65vw, 11px);
+      font-size: clamp(9px, 0.8vw, 13px);
       color: var(--muted);
+      font-weight: 600;
     }
 
     .upcoming-matchup {
       display: flex;
       flex-direction: column;
-      gap: 0.2vh;
+      gap: 0.15vh;
     }
 
     .upcoming-team {
-      font-size: clamp(10px, 0.95vw, 16px);
+      font-size: clamp(11px, 1.1vw, 18px);
       font-weight: 600;
     }
 
     .upcoming-vs {
-      font-size: clamp(7px, 0.7vw, 11px);
+      font-size: clamp(9px, 0.85vw, 14px);
       color: var(--muted);
+      font-weight: 400;
+      margin: 0 0.25vw;
     }
 
     .upcoming-venue {
-      font-size: clamp(7px, 0.65vw, 11px);
+      font-size: clamp(8px, 0.75vw, 13px);
       color: var(--muted);
       text-align: right;
     }
@@ -515,6 +543,58 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .empty { color: var(--muted); font-size: clamp(9px, 0.85vw, 14px); padding: 2vh 0; text-align: center; }
+
+    /* ── Live panel: expand cards to fill available height (max 5 games) ── */
+    #live-panel {
+      gap: 0.45vh;
+      padding: 0.5vh 1.2vw;
+    }
+    #live-panel .game-card.live {
+      flex: 1 1 0;
+      min-height: 0;
+      align-items: stretch;
+      padding: 0.5vh 1.2vw;
+    }
+    #live-panel .game-teams,
+    #live-panel .game-scores {
+      align-self: stretch;
+      justify-content: space-evenly;
+      gap: 0;
+    }
+    #live-panel .stat-strip {
+      display: none;
+    }
+    #live-panel .team-logo,
+    #live-panel .team-logo-placeholder {
+      display: none;
+    }
+    #live-panel .team-name {
+      font-size: clamp(14px, 1.9vw, 32px);
+      font-weight: 700;
+      max-width: 20vw;
+    }
+    #live-panel .team-row {
+      align-items: center;
+    }
+    #live-panel .score {
+      font-size: clamp(26px, 3.4vw, 58px);
+    }
+    #live-panel .seed-badge {
+      min-width: clamp(16px, 1.7vw, 28px);
+      height: clamp(16px, 1.7vw, 28px);
+      font-size: clamp(8px, 0.8vw, 13px);
+    }
+    #live-panel .game-status {
+      align-self: center;
+      min-width: 6vw;
+      gap: 0.25vh;
+    }
+    #live-panel .status-period {
+      font-size: clamp(12px, 1.3vw, 22px);
+    }
+    #live-panel .status-clock {
+      font-size: clamp(20px, 2.6vw, 46px);
+    }
   </style>
 </head>
 <body>
@@ -524,7 +604,7 @@
     <header>
       <div class="header-left">
         <div class="logo-badge">NCAA</div>
-        <h1>NCAA March Madness &mdash; Live Scoreboard</h1>
+        <h1>BIGGE March Madness &mdash; Live Scoreboard</h1>
       </div>
       <div class="header-right">
         <span id="live-indicator" class="live-dot" style="display:none">LIVE</span>
@@ -717,23 +797,46 @@ function buildGameCard(event, group) {
   const statusDiv = document.createElement('div');
   statusDiv.className = 'game-status';
 
-  const statusLabel = document.createElement('div');
-  statusLabel.className = `status-label ${group === 'live' ? 'live' : group === 'final' ? 'final' : 'scheduled'}`;
-  statusLabel.textContent = group === 'live' ? statusDetail || 'LIVE' : group === 'final' ? 'FINAL' : 'TODAY';
-  statusDiv.appendChild(statusLabel);
-
-  if (group === 'final') {
+  if (group === 'live') {
+    // Parse "2nd - 14:32" → period label + clock, or "Half" → just label
+    const detail = statusDetail.toLowerCase();
+    let periodLabel = 'LIVE';
+    let clock = '';
+    if (detail === 'half' || detail === 'halftime') {
+      periodLabel = 'HALF';
+    } else {
+      const dash = statusDetail.indexOf('-');
+      if (dash > -1) {
+        periodLabel = statusDetail.slice(0, dash).trim().toUpperCase(); // "1ST" / "2ND"
+        clock = statusDetail.slice(dash + 1).trim();                    // "14:32"
+      } else {
+        periodLabel = statusDetail || 'LIVE';
+      }
+    }
+    const perEl = document.createElement('div');
+    perEl.className = 'status-period';
+    perEl.textContent = periodLabel;
+    statusDiv.appendChild(perEl);
+    if (clock) {
+      const clockEl = document.createElement('div');
+      clockEl.className = 'status-clock';
+      clockEl.textContent = clock;
+      statusDiv.appendChild(clockEl);
+    }
+  } else if (group === 'final') {
+    const lbl = document.createElement('div');
+    lbl.className = 'status-label final';
+    lbl.textContent = 'FINAL';
+    statusDiv.appendChild(lbl);
     const dateEl = document.createElement('div');
     dateEl.className = 'status-detail';
     dateEl.textContent = new Date(event.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
     statusDiv.appendChild(dateEl);
-  }
-
-  if (group === 'live' && status?.period) {
-    const per = document.createElement('div');
-    per.className = 'status-detail';
-    per.textContent = `Per ${status.period}`;
-    statusDiv.appendChild(per);
+  } else {
+    const lbl = document.createElement('div');
+    lbl.className = 'status-label scheduled';
+    lbl.textContent = 'TODAY';
+    statusDiv.appendChild(lbl);
   }
 
   card.appendChild(statusDiv);
@@ -756,7 +859,7 @@ function buildUpcomingCard(event, isTomorrow) {
 
   const timeDiv = document.createElement('div');
   timeDiv.className = 'upcoming-time';
-  timeDiv.innerHTML = `<span class="time">${time}</span><span class="ampm" style="font-size:clamp(6px,0.6vw,10px);color:var(--muted)">${dateLabel}</span>`;
+  timeDiv.innerHTML = `<span class="time">${time}</span><span class="ampm">${dateLabel}</span>`;
   card.appendChild(timeDiv);
 
   function seedBadge(competitor) {
@@ -782,7 +885,7 @@ function buildUpcomingCard(event, isTomorrow) {
   awayNameSpan.textContent = away.team?.shortDisplayName || away.team?.displayName || 'TBD';
   teamLine.appendChild(awayNameSpan);
   const vsSpan = document.createElement('span');
-  vsSpan.style.cssText = 'color:var(--muted);font-weight:400;margin:0 0.2vw';
+  vsSpan.className = 'upcoming-vs';
   vsSpan.textContent = '@';
   teamLine.appendChild(vsSpan);
   const homeBadge = seedBadge(home);
@@ -805,12 +908,44 @@ function buildUpcomingCard(event, isTomorrow) {
 }
 
 
+// ── Preview: 5 earliest tomorrow games shown as live ───────────────────────
+
+const PREVIEW_LIVE = true;
+
+function mockTeam(shortName, abbrev) {
+  return { shortDisplayName: shortName, displayName: shortName, abbreviation: abbrev, logos: [] };
+}
+
+function mockComp(awayName, awayAbbr, awaySeed, awayScore,
+                  homeName, homeAbbr, homeSeed, homeScore,
+                  detail, period, venue, city) {
+  return {
+    date: '',
+    competitions: [{
+      competitors: [
+        { homeAway: 'away', score: String(awayScore), curatedRank: { current: awaySeed }, team: mockTeam(awayName, awayAbbr) },
+        { homeAway: 'home', score: String(homeScore), curatedRank: { current: homeSeed }, team: mockTeam(homeName, homeAbbr) },
+      ],
+      status: { type: { name: 'STATUS_IN_PROGRESS', shortDetail: detail }, period },
+      venue: { fullName: venue, address: { city } },
+    }],
+  };
+}
+
+const MOCK_LIVE_GAMES = [
+  mockComp('Auburn',    'AUB',  1,  58, 'Montana St',   'MTST', 16, 34, '2nd - 14:32', 2, 'PPG Paints Arena',    'Pittsburgh, PA'),
+  mockComp('Tennessee', 'TENN', 2,  47, 'Cleveland St',  'CSU', 15, 29, '2nd - 11:08', 2, 'Gainbridge Fieldhouse','Indianapolis, IN'),
+  mockComp('Gonzaga',   'GONZ', 8,  38, 'Memphis',       'MEM',  9, 41, 'Half',         1, 'Lenovo Center',       'Raleigh, NC'),
+  mockComp('Oregon',    'ORE',  5,  33, 'Liberty',       'LIB', 12, 28, '1st - 3:47',   1, 'Heritage Bank Center','Cincinnati, OH'),
+  mockComp('Kansas',    'KAN',  4,  21, 'UCF',           'UCF', 13, 17, '1st - 12:15',  1, 'Fiserv Forum',        'Milwaukee, WI'),
+];
+
 // ── Render ─────────────────────────────────────────────────────────────────
 
 function render(data, tomorrowEvents) {
   const events = data.events || [];
 
-  const live = events.filter(e => getStatusGroup(e) === 'live');
+  const live = PREVIEW_LIVE ? MOCK_LIVE_GAMES : events.filter(e => getStatusGroup(e) === 'live');
   const final = events.filter(e => getStatusGroup(e) === 'final');
   const upcoming = events.filter(e => getStatusGroup(e) === 'upcoming');
 
