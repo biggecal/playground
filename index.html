@@ -189,7 +189,7 @@
     /* Game cards */
     .game-card {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 5px solid var(--border);
       border-radius: 0.5vw;
       padding: 0.9vh 1.2vw;
       display: grid;
@@ -201,7 +201,7 @@
     }
 
     .game-card.live {
-      border-color: rgba(239, 68, 68, 0.4);
+      border-color: rgb(128 249 182 / 40%);
       background: linear-gradient(135deg, #180d0d 0%, var(--surface) 60%);
     }
 
@@ -546,7 +546,7 @@
 
     /* ── Live panel: expand cards to fill available height (max 5 games) ── */
     #live-panel {
-      gap: 0.45vh;
+      gap: 1.45vh;
       padding: 0.5vh 1.2vw;
     }
     #live-panel .game-card.live {
@@ -569,7 +569,7 @@
       display: none;
     }
     #live-panel .team-name {
-      font-size: clamp(14px, 1.9vw, 32px);
+      font-size: clamp(16px, 2.3vw, 38px);
       font-weight: 700;
       max-width: 20vw;
     }
@@ -580,9 +580,9 @@
       font-size: clamp(26px, 3.4vw, 58px);
     }
     #live-panel .seed-badge {
-      min-width: clamp(16px, 1.7vw, 28px);
-      height: clamp(16px, 1.7vw, 28px);
-      font-size: clamp(8px, 0.8vw, 13px);
+      min-width: clamp(20px, 2.1vw, 34px);
+      height: clamp(20px, 2.1vw, 34px);
+      font-size: clamp(10px, 1.1vw, 18px);
     }
     #live-panel .game-status {
       align-self: center;
