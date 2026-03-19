@@ -189,7 +189,7 @@
     /* Game cards */
     .game-card {
       background: var(--surface);
-      border: 5px solid var(--border);
+      border: 1px solid var(--border);
       border-radius: 0.5vw;
       padding: 0.9vh 1.2vw;
       display: grid;
@@ -203,6 +203,87 @@
     .game-card.live {
       border-color: rgb(128 249 182 / 40%);
       background: linear-gradient(135deg, #180d0d 0%, var(--surface) 60%);
+    }
+
+    .last-play-label {
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 0.85em;
+      letter-spacing: 0.06em;
+    }
+
+    .top-performers {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 0.8vw;
+      padding-top: 0.5vh;
+      border-top: 1px solid var(--border);
+      margin-top: 0.2vh;
+    }
+
+    .performer {
+      display: flex;
+      align-items: center;
+      gap: 0.4vw;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .performer-team-logo {
+      width: clamp(14px, 1.4vw, 24px);
+      height: clamp(14px, 1.4vw, 24px);
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .performer-headshot {
+      width: clamp(22px, 2.2vw, 40px);
+      height: clamp(22px, 2.2vw, 40px);
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--surface2);
+    }
+
+    .performer-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .performer-name {
+      font-size: clamp(9px, 0.85vw, 14px);
+      font-weight: 600;
+      color: #ddd;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .performer-stat {
+      font-size: clamp(8px, 0.75vw, 12px);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .last-play-team {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .last-play {
+      grid-column: 1 / -1;
+      font-size: clamp(10px, 1vw, 17px);
+      color: #c8c8c8;
+      border-top: 1px solid var(--border);
+      padding-top: 0.5vh;
+      margin-top: 0.2vh;
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: 0.01em;
     }
 
     .game-card.final {
@@ -224,9 +305,7 @@
     .team-logo {
       width: clamp(16px, 1.6vw, 28px);
       height: clamp(16px, 1.6vw, 28px);
-      border-radius: 50%;
       object-fit: contain;
-      background: var(--surface2);
       flex-shrink: 0;
     }
 
@@ -253,10 +332,10 @@
       padding: 0 0.25vw;
       border-radius: 0.25vw;
       background: var(--surface2);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255,255,255,0.25);
       font-size: clamp(7px, 0.65vw, 11px);
       font-weight: 800;
-      color: var(--muted);
+      color: #fff;
       flex-shrink: 0;
       letter-spacing: 0;
     }
@@ -610,7 +689,9 @@
     }
     #live-panel .team-logo,
     #live-panel .team-logo-placeholder {
-      display: none;
+      width: clamp(24px, 2.8vw, 48px);
+      height: clamp(24px, 2.8vw, 48px);
+      font-size: clamp(9px, 0.9vw, 15px);
     }
     #live-panel .team-name {
       font-size: clamp(16px, 2.3vw, 38px);
@@ -646,6 +727,63 @@
     #live-panel .team-spread {
       font-size: clamp(13px, 1.6vw, 26px);
     }
+
+    /* Next-up cards (shown in live panel when no games are live) */
+    .game-card.next-up {
+      border-color: rgba(255, 200, 80, 0.3);
+      background: linear-gradient(135deg, #141008 0%, var(--surface) 60%);
+    }
+
+    .countdown-timer {
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+
+    .next-up-label {
+      font-size: clamp(8px, 0.75vw, 12px);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: rgba(255, 200, 80, 0.7);
+      text-transform: uppercase;
+      margin-bottom: 0.2vh;
+    }
+
+    /* 6+ live games — hide supplemental data to save space */
+    #live-panel.many-games .last-play,
+    #live-panel.many-games .top-performers {
+      display: none;
+    }
+
+    /* 4 live games — scale down moderately */
+    #live-panel[data-count="4"] .team-name  { font-size: clamp(13px, 1.8vw, 30px); }
+    #live-panel[data-count="4"] .score      { font-size: clamp(20px, 2.6vw, 44px); }
+    #live-panel[data-count="4"] .status-clock  { font-size: clamp(15px, 2vw, 34px); }
+    #live-panel[data-count="4"] .status-period { font-size: clamp(10px, 1.1vw, 18px); }
+    #live-panel[data-count="4"] .status-ou     { font-size: clamp(9px, 0.95vw, 15px); }
+    #live-panel[data-count="4"] .team-spread   { font-size: clamp(10px, 1.2vw, 20px); }
+    #live-panel[data-count="4"] .seed-badge    { min-width: clamp(16px, 1.7vw, 28px); height: clamp(16px, 1.7vw, 28px); font-size: clamp(8px, 0.9vw, 14px); }
+    #live-panel[data-count="4"] .team-logo,
+    #live-panel[data-count="4"] .team-logo-placeholder { width: clamp(18px, 2.2vw, 38px); height: clamp(18px, 2.2vw, 38px); }
+    #live-panel[data-count="4"] .last-play  { font-size: clamp(8px, 0.85vw, 14px); }
+    #live-panel[data-count="4"] .performer-headshot { width: clamp(18px, 1.8vw, 32px); height: clamp(18px, 1.8vw, 32px); }
+    #live-panel[data-count="4"] .performer-name { font-size: clamp(8px, 0.75vw, 12px); }
+    #live-panel[data-count="4"] .performer-stat { font-size: clamp(7px, 0.65vw, 11px); }
+
+    /* 5 live games — scale down more aggressively */
+    #live-panel[data-count="5"] .team-name  { font-size: clamp(11px, 1.5vw, 24px); }
+    #live-panel[data-count="5"] .score      { font-size: clamp(16px, 2.1vw, 36px); }
+    #live-panel[data-count="5"] .status-clock  { font-size: clamp(12px, 1.6vw, 28px); }
+    #live-panel[data-count="5"] .status-period { font-size: clamp(8px, 0.9vw, 15px); }
+    #live-panel[data-count="5"] .status-ou     { font-size: clamp(8px, 0.8vw, 13px); }
+    #live-panel[data-count="5"] .team-spread   { font-size: clamp(9px, 1vw, 17px); }
+    #live-panel[data-count="5"] .seed-badge    { min-width: clamp(14px, 1.4vw, 22px); height: clamp(14px, 1.4vw, 22px); font-size: clamp(7px, 0.75vw, 12px); }
+    #live-panel[data-count="5"] .team-logo,
+    #live-panel[data-count="5"] .team-logo-placeholder { width: clamp(16px, 1.8vw, 30px); height: clamp(16px, 1.8vw, 30px); }
+    #live-panel[data-count="5"] .last-play  { font-size: clamp(7px, 0.75vw, 12px); }
+    #live-panel[data-count="5"] .performer-headshot { width: clamp(16px, 1.5vw, 26px); height: clamp(16px, 1.5vw, 26px); }
+    #live-panel[data-count="5"] .performer-name { font-size: clamp(7px, 0.65vw, 11px); }
+    #live-panel[data-count="5"] .performer-stat { font-size: clamp(6px, 0.6vw, 10px); }
   </style>
 </head>
 <body>
@@ -654,8 +792,8 @@
 
     <header>
       <div class="header-left">
-        <div class="logo-badge">NCAA</div>
-        <h1>BIGGE March Madness &mdash; Live Scoreboard</h1>
+        <div class="logo-badge">BIGGE BRACKETS</div>
+        <h1> March Madness &mdash; Live Scoreboard</h1>
       </div>
       <div class="header-right">
         <span id="live-indicator" class="live-dot" style="display:none">LIVE</span>
@@ -705,14 +843,17 @@
         <span class="ticker-label">ESPN</span>
         <span class="ticker-text" id="ticker-text">Loading scores...</span>
       </div>
-      <span class="refresh-info">Auto-refresh every 60s &nbsp;|&nbsp; Data: ESPN API</span>
+      <span class="refresh-info">Auto-refresh every 10s &nbsp;|&nbsp; Data: ESPN API</span>
     </footer>
 
   </div>
 </div>
 
 <script>
-const API = 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard';
+const API_BASE = 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard';
+function todayDateStr() {
+  return new Date().toISOString().slice(0, 10).replace(/-/g, '');
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -771,7 +912,11 @@ function buildGameCard(event, group) {
   const comp = event.competitions[0];
   const home = getCompetitor(comp, 'home');
   const away = getCompetitor(comp, 'away');
-  if (group === 'live') console.log('ODDS DEBUG', away.team?.abbreviation, '@', home.team?.abbreviation, comp.odds);
+  if (group === 'live') {
+    console.log('ODDS DEBUG', away.team?.abbreviation, '@', home.team?.abbreviation, comp.odds);
+    console.log('LEADERS DEBUG', away.team?.abbreviation, '@', home.team?.abbreviation, comp.leaders);
+    console.log('COMPETITORS DEBUG', comp.competitors?.map(c => ({ homeAway: c.homeAway, leaders: c.leaders })));
+  }
   const status = comp.status;
   const statusType = status?.type?.name || '';
   const statusDetail = status?.type?.shortDetail || status?.type?.detail || '';
@@ -843,8 +988,8 @@ function buildGameCard(event, group) {
   teamsDiv.appendChild(teamRow(away, awayWins, !awayWins && isFinal, awaySpread));
   teamsDiv.appendChild(teamRow(home, homeWins, !homeWins && isFinal, homeSpread));
 
-  // Venue strip
-  if (venue) {
+  // Venue strip — only show for live games, not finals
+  if (venue && isLive) {
     const strip = document.createElement('div');
     strip.className = 'stat-strip';
     const v = document.createElement('div');
@@ -927,6 +1072,181 @@ function buildGameCard(event, group) {
 
   card.appendChild(statusDiv);
 
+  if (isLive) {
+    const lastPlay = comp.situation?.lastPlay;
+    const lastPlayText = lastPlay?.text;
+    if (lastPlayText) {
+      const lpEl = document.createElement('div');
+      lpEl.className = 'last-play';
+      const lastPlayTeamId = lastPlay?.team?.id;
+      let teamLabel = '';
+      if (lastPlayTeamId) {
+        const matched = lastPlayTeamId === away.team?.id ? away.team : lastPlayTeamId === home.team?.id ? home.team : null;
+        if (matched) teamLabel = matched.shortDisplayName || matched.displayName || matched.abbreviation || '';
+      }
+      lpEl.innerHTML = teamLabel
+        ? `<span class="last-play-label">Last Play:</span> <span class="last-play-team">${teamLabel}</span> &ndash; ${lastPlayText}`
+        : `<span class="last-play-label">Last Play:</span> ${lastPlayText}`;
+      card.appendChild(lpEl);
+    }
+
+    // Leaders can live on comp.leaders or on each competitor, in two formats:
+    // Category format: { displayName, leaders: [{ athlete, displayValue }] }
+    // Flat format: { displayName, athlete, displayValue }
+    const normalizedLeaders = [];
+    const addLeaders = arr => arr?.forEach(item => {
+      if (item.leaders?.length) {
+        // Category format — unwrap nested leaders
+        item.leaders.forEach(l => normalizedLeaders.push({ label: item.shortDisplayName || item.displayName || '', ...l }));
+      } else if (item.athlete) {
+        // Flat format — item itself is the leader
+        normalizedLeaders.push({ label: item.shortDisplayName || item.displayName || '', ...item });
+      }
+    });
+    addLeaders(comp.leaders);
+    comp.competitors?.forEach(c => addLeaders(c.leaders));
+    console.log('NORMALIZED LEADERS', normalizedLeaders);
+
+    if (normalizedLeaders.length) {
+      const performersDiv = document.createElement('div');
+      performersDiv.className = 'top-performers';
+
+      // Dedupe by athlete id
+      const seen = new Set();
+      const unique = normalizedLeaders.filter(l => {
+        const id = l.athlete?.id;
+        if (!id || seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
+
+      const filtered = unique.filter(l => /point|pts/i.test(l.label) || /reb/i.test(l.label));
+
+      filtered.slice(0, 2).forEach(category => {
+        const leader = category;
+        const athlete = leader?.athlete;
+        if (!athlete) return;
+
+        const p = document.createElement('div');
+        p.className = 'performer';
+
+        // Team logo
+        const athleteTeamId = athlete.team?.id;
+        const matchedTeam = athleteTeamId === away.team?.id ? away.team : athleteTeamId === home.team?.id ? home.team : athlete.team || null;
+        if (matchedTeam) {
+          const tl = logoEl(matchedTeam);
+          tl.className = 'performer-team-logo';
+          p.appendChild(tl);
+        }
+
+        // Player headshot
+        const headshotUrl = athlete.headshot?.href || (typeof athlete.headshot === 'string' ? athlete.headshot : null);
+        if (headshotUrl) {
+          const img = document.createElement('img');
+          img.className = 'performer-headshot';
+          img.src = headshotUrl;
+          img.alt = athlete.shortName || '';
+          img.onerror = () => img.remove();
+          p.appendChild(img);
+        }
+
+        const info = document.createElement('div');
+        info.className = 'performer-info';
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'performer-name';
+        nameEl.textContent = athlete.shortName || athlete.displayName || '';
+        info.appendChild(nameEl);
+
+        const statEl = document.createElement('div');
+        statEl.className = 'performer-stat';
+        statEl.textContent = `${leader.displayValue} ${leader.label}`;
+        info.appendChild(statEl);
+
+        p.appendChild(info);
+        performersDiv.appendChild(p);
+      });
+
+      if (performersDiv.children.length) card.appendChild(performersDiv);
+    }
+  }
+
+  return card;
+}
+
+function buildNextUpCard(event) {
+  const comp = event.competitions[0];
+  const home = getCompetitor(comp, 'home');
+  const away = getCompetitor(comp, 'away');
+
+  const card = document.createElement('div');
+  card.className = 'game-card next-up';
+
+  function teamRow(competitor) {
+    const row = document.createElement('div');
+    row.className = 'team-row';
+    row.appendChild(logoEl(competitor.team || {}));
+    const seed = competitor.curatedRank?.current;
+    if (seed && seed <= 16) {
+      const b = document.createElement('span');
+      b.className = 'seed-badge';
+      b.textContent = seed;
+      row.appendChild(b);
+    }
+    const nameEl = document.createElement('span');
+    nameEl.className = 'team-name';
+    nameEl.textContent = competitor.team?.shortDisplayName || competitor.team?.displayName || 'TBD';
+    row.appendChild(nameEl);
+    return row;
+  }
+
+  const teamsDiv = document.createElement('div');
+  teamsDiv.className = 'game-teams';
+  teamsDiv.appendChild(teamRow(away));
+  teamsDiv.appendChild(teamRow(home));
+  card.appendChild(teamsDiv);
+
+  // Dash placeholders for scores
+  const scoresDiv = document.createElement('div');
+  scoresDiv.className = 'game-scores';
+  [1, 2].forEach(() => {
+    const s = document.createElement('div');
+    s.className = 'score';
+    s.textContent = '—';
+    scoresDiv.appendChild(s);
+  });
+  card.appendChild(scoresDiv);
+
+  // Status: tip-off time + live countdown
+  const statusDiv = document.createElement('div');
+  statusDiv.className = 'game-status';
+
+  const label = document.createElement('div');
+  label.className = 'next-up-label';
+  label.textContent = 'NEXT UP';
+  statusDiv.appendChild(label);
+
+  const { time, ampm } = splitTime(event.date);
+  const timeEl = document.createElement('div');
+  timeEl.className = 'status-period';
+  timeEl.textContent = `${time} ${ampm}`;
+  statusDiv.appendChild(timeEl);
+
+  const countdown = document.createElement('div');
+  countdown.className = 'status-clock countdown-timer';
+  countdown.dataset.tipoff = event.date;
+  statusDiv.appendChild(countdown);
+
+  const oddsInfo = comp.odds?.[0];
+  if (oddsInfo?.overUnder != null) {
+    const ouEl = document.createElement('div');
+    ouEl.className = 'status-ou';
+    const ou = oddsInfo.overUnder;
+    ouEl.textContent = `O/U ${ou % 1 === 0 ? ou + '.0' : ou}`;
+    statusDiv.appendChild(ouEl);
+  }
+
+  card.appendChild(statusDiv);
   return card;
 }
 
@@ -965,6 +1285,8 @@ function buildUpcomingCard(event, isTomorrow) {
   teamLine.style.display = 'flex';
   teamLine.style.alignItems = 'center';
   teamLine.style.gap = '0.4vw';
+  const awayLogo = logoEl(away.team || {});
+  teamLine.appendChild(awayLogo);
   const awayBadge = seedBadge(away);
   if (awayBadge) teamLine.appendChild(awayBadge);
   const awayNameSpan = document.createElement('span');
@@ -974,6 +1296,8 @@ function buildUpcomingCard(event, isTomorrow) {
   vsSpan.className = 'upcoming-vs';
   vsSpan.textContent = '@';
   teamLine.appendChild(vsSpan);
+  const homeLogo = logoEl(home.team || {});
+  teamLine.appendChild(homeLogo);
   const homeBadge = seedBadge(home);
   if (homeBadge) teamLine.appendChild(homeBadge);
   const homeNameSpan = document.createElement('span');
@@ -1019,32 +1343,74 @@ function buildUpcomingCard(event, isTomorrow) {
 const PREVIEW_LIVE = false;
 
 function mockTeam(shortName, abbrev) {
-  return { shortDisplayName: shortName, displayName: shortName, abbreviation: abbrev, logos: [] };
+  return { id: abbrev, shortDisplayName: shortName, displayName: shortName, abbreviation: abbrev, logos: [] };
+}
+
+function mockLeader(catShort, displayValue, playerShort, playerId, teamAbbrev) {
+  return {
+    name: catShort,
+    displayName: catShort,
+    shortDisplayName: catShort,
+    displayValue,
+    athlete: {
+      id: playerId,
+      displayName: playerShort,
+      shortName: playerShort,
+      headshot: null,
+      team: { id: teamAbbrev }
+    }
+  };
 }
 
 function mockComp(awayName, awayAbbr, awaySeed, awayScore,
                   homeName, homeAbbr, homeSeed, homeScore,
-                  detail, period, venue, city, overUnder, oddsDetails) {
+                  detail, period, venue, city, overUnder, oddsDetails,
+                  lastPlayText, lastPlayTeam, awayLeaders, homeLeaders) {
   return {
     date: '',
     competitions: [{
       competitors: [
-        { homeAway: 'away', score: String(awayScore), curatedRank: { current: awaySeed }, team: mockTeam(awayName, awayAbbr) },
-        { homeAway: 'home', score: String(homeScore), curatedRank: { current: homeSeed }, team: mockTeam(homeName, homeAbbr) },
+        { homeAway: 'away', score: String(awayScore), curatedRank: { current: awaySeed }, team: mockTeam(awayName, awayAbbr), leaders: awayLeaders || [] },
+        { homeAway: 'home', score: String(homeScore), curatedRank: { current: homeSeed }, team: mockTeam(homeName, homeAbbr), leaders: homeLeaders || [] },
       ],
       status: { type: { name: 'STATUS_IN_PROGRESS', shortDetail: detail }, period },
       venue: { fullName: venue, address: { city } },
       odds: overUnder != null ? [{ overUnder, details: oddsDetails || '' }] : [],
+      situation: lastPlayText ? { lastPlay: { text: lastPlayText, team: { id: lastPlayTeam } } } : undefined,
     }],
   };
 }
 
 const MOCK_LIVE_GAMES = [
-  mockComp('Auburn',    'AUB',  1,  58, 'Montana St',   'MTST', 16, 34, '2nd - 14:32', 2, 'PPG Paints Arena',     'Pittsburgh, PA',    148.5, 'Auburn -22.5'),
-  mockComp('Tennessee', 'TENN', 2,  47, 'Cleveland St',  'CSU', 15, 29, '2nd - 11:08', 2, 'Gainbridge Fieldhouse','Indianapolis, IN',  132.0, 'Tennessee -17.5'),
-  mockComp('Gonzaga',   'GONZ', 8,  38, 'Memphis',       'MEM',  9, 41, 'Half',         1, 'Lenovo Center',        'Raleigh, NC',       155.5, 'Memphis -2.5'),
-  mockComp('Oregon',    'ORE',  5,  33, 'Liberty',       'LIB', 12, 28, '1st - 3:47',   1, 'Heritage Bank Center', 'Cincinnati, OH',    141.0, 'Oregon -6.5'),
-  mockComp('Kansas',    'KAN',  4,  21, 'UCF',           'UCF', 13, 17, '1st - 12:15',  1, 'Fiserv Forum',         'Milwaukee, WI',     144.5, 'Kansas -5.5'),
+  mockComp('Auburn', 'AUB', 1, 58, 'Montana St', 'MTST', 16, 34,
+    '2nd - 14:32', 2, 'PPG Paints Arena', 'Pittsburgh, PA', 148.5, 'Auburn -22.5',
+    'Good dunk by Johni Broome', 'AUB',
+    [mockLeader('PTS', '22 ', 'J. Broome', 'aub-broome', 'AUB')],
+    [mockLeader('REB', '9 ', 'T. Causey', 'mtst-causey', 'MTST')]),
+
+  mockComp('Tennessee', 'TENN', 2, 47, 'Cleveland St', 'CSU', 15, 29,
+    '2nd - 11:08', 2, 'Gainbridge Fieldhouse', 'Indianapolis, IN', 132.0, 'Tennessee -17.5',
+    'Turnover by D. Gordon', 'CSU',
+    [mockLeader('PTS', '19 ', 'J. James', 'tenn-james', 'TENN')],
+    [mockLeader('REB', '6 ', 'D. Gordon', 'csu-gordon', 'CSU')]),
+
+  mockComp('Gonzaga', 'GONZ', 8, 38, 'Memphis', 'MEM', 9, 41,
+    'Half', 1, 'Lenovo Center', 'Raleigh, NC', 155.5, 'Memphis -2.5',
+    'Good 3-pt jumper by K. Davis', 'MEM',
+    [mockLeader('REB', '8 ', 'G. Timme', 'gonz-timme', 'GONZ')],
+    [mockLeader('PTS', '17 ', 'K. Davis', 'mem-davis', 'MEM')]),
+
+ /* mockComp('Oregon', 'ORE', 5, 33, 'Liberty', 'LIB', 12, 28,
+    '1st - 3:47', 1, 'Heritage Bank Center', 'Cincinnati, OH', 141.0, 'Oregon -6.5',
+    'Foul on N. Dante', 'LIB',
+    [mockLeader('PTS', '14 Pts', 'N. Dante', 'ore-dante', 'ORE')],
+    [mockLeader('REB', '7 Reb', 'D. Mays', 'lib-mays', 'LIB')]),
+
+  mockComp('Kansas', 'KAN', 4, 21, 'UCF', 'UCF', 13, 17,
+    '1st - 12:15', 1, 'Fiserv Forum', 'Milwaukee, WI', 144.5, 'Kansas -5.5',
+    'Good layup by H. Dickinson', 'KAN',
+    [mockLeader('PTS', '11 Pts', 'H. Dickinson', 'kan-dickinson', 'KAN')],
+    [mockLeader('REB', '5 Reb', 'T. Anderson', 'ucf-anderson', 'UCF')]),*/
 ];
 
 // ── Render ─────────────────────────────────────────────────────────────────
@@ -1059,7 +1425,13 @@ function render(data, tomorrowEvents) {
   // Counts
   document.getElementById('live-count').textContent = live.length;
   document.getElementById('final-count').textContent = final.length;
-  document.getElementById('upcoming-count').textContent = upcoming.length + tomorrowEvents.length;
+  const seenIdsCount = new Set();
+  const totalUpcoming = [...upcoming, ...tomorrowEvents].filter(e => {
+    if (seenIdsCount.has(e.id)) return false;
+    seenIdsCount.add(e.id);
+    return true;
+  }).length;
+  document.getElementById('upcoming-count').textContent = totalUpcoming;
 
   // Live indicator in header
   document.getElementById('live-indicator').style.display = live.length ? 'inline-flex' : 'none';
@@ -1067,6 +1439,8 @@ function render(data, tomorrowEvents) {
   // Live panel
   const livePanel = document.getElementById('live-panel');
   livePanel.innerHTML = '';
+  livePanel.dataset.count = live.length;
+  livePanel.classList.toggle('many-games', live.length > 4);
   if (live.length === 0) {
     livePanel.innerHTML = '<div class="empty">No games in progress</div>';
   } else {
@@ -1085,11 +1459,16 @@ function render(data, tomorrowEvents) {
   // Upcoming panel
   const upcomingPanel = document.getElementById('upcoming-panel');
   upcomingPanel.innerHTML = '';
-  if (upcoming.length === 0 && tomorrowEvents.length === 0) {
+  const seenIds = new Set();
+  const allUpcoming = [...upcoming, ...tomorrowEvents].filter(e => {
+    if (seenIds.has(e.id)) return false;
+    seenIds.add(e.id);
+    return true;
+  });
+  if (allUpcoming.length === 0) {
     upcomingPanel.innerHTML = '<div class="empty">No upcoming games scheduled</div>';
   } else {
-    upcoming.forEach(e => upcomingPanel.appendChild(buildUpcomingCard(e, false)));
-    tomorrowEvents.forEach(e => upcomingPanel.appendChild(buildUpcomingCard(e, true)));
+    allUpcoming.forEach(e => upcomingPanel.appendChild(buildUpcomingCard(e, tomorrowEvents.includes(e))));
   }
 
   // Ticker
@@ -1127,8 +1506,8 @@ function tomorrowDateStr() {
 async function fetchScores() {
   try {
     const [todayRes, tomorrowRes] = await Promise.all([
-      fetch(API + '?_=' + Date.now()),
-      fetch(API + '?dates=' + tomorrowDateStr() + '&_=' + Date.now()),
+      fetch(`${API_BASE}?dates=${todayDateStr()}&_=${Date.now()}`),
+      fetch(`${API_BASE}?dates=${tomorrowDateStr()}&_=${Date.now()}`),
     ]);
     if (!todayRes.ok) throw new Error(todayRes.status);
     const data = await todayRes.json();
@@ -1146,6 +1525,21 @@ async function fetchScores() {
 function updateClock() {
   document.getElementById('header-time').textContent =
     new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+
+  const now = Date.now();
+  document.querySelectorAll('.countdown-timer[data-tipoff]').forEach(el => {
+    const diff = new Date(el.dataset.tipoff).getTime() - now;
+    if (diff <= 0) {
+      el.textContent = 'TIP OFF';
+      return;
+    }
+    const h = Math.floor(diff / 3_600_000);
+    const m = Math.floor((diff % 3_600_000) / 60_000);
+    const s = Math.floor((diff % 60_000) / 1_000);
+    el.textContent = h > 0
+      ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+      : `${m}:${String(s).padStart(2, '0')}`;
+  });
 }
 
 // ── Auto-scroll ────────────────────────────────────────────────────────────
@@ -1202,7 +1596,7 @@ function resetScrollers() {
 fetchScores();
 updateClock();
 requestAnimationFrame(tickScroll);
-setInterval(async () => { await fetchScores(); resetScrollers(); }, 10_000);
+setInterval(async () => { await fetchScores(); }, 100_000);
 setInterval(updateClock, 1_000);
 </script>
 </body>
