@@ -914,9 +914,6 @@ function buildGameCard(event, group) {
   const home = getCompetitor(comp, 'home');
   const away = getCompetitor(comp, 'away');
   if (group === 'live') {
-    console.log('ODDS DEBUG', away.team?.abbreviation, '@', home.team?.abbreviation, comp.odds);
-    console.log('LEADERS DEBUG', away.team?.abbreviation, '@', home.team?.abbreviation, comp.leaders);
-    console.log('COMPETITORS DEBUG', comp.competitors?.map(c => ({ homeAway: c.homeAway, leaders: c.leaders })));
   }
   const status = comp.status;
   const statusType = status?.type?.name || '';
@@ -1091,39 +1088,50 @@ function buildGameCard(event, group) {
       card.appendChild(lpEl);
     }
 
-    // Leaders can live on comp.leaders or on each competitor, in two formats:
-    // Category format: { displayName, leaders: [{ athlete, displayValue }] }
-    // Flat format: { displayName, athlete, displayValue }
-    const normalizedLeaders = [];
-    const addLeaders = arr => arr?.forEach(item => {
-      if (item.leaders?.length) {
-        // Category format — unwrap nested leaders
-        item.leaders.forEach(l => normalizedLeaders.push({ label: item.shortDisplayName || item.displayName || '', ...l }));
-      } else if (item.athlete) {
-        // Flat format — item itself is the leader
-        normalizedLeaders.push({ label: item.shortDisplayName || item.displayName || '', ...item });
-      }
-    });
-    addLeaders(comp.leaders);
-    comp.competitors?.forEach(c => addLeaders(c.leaders));
-    console.log('NORMALIZED LEADERS', normalizedLeaders);
+    // Normalize a leaders array (handles both category and flat formats)
+    const normalizeLeaders = arr => {
+      const out = [];
+      (arr || []).forEach(item => {
+        if (item.leaders?.length) {
+          item.leaders.forEach(l => out.push({ label: item.shortDisplayName || item.displayName || '', ...l }));
+        } else if (item.athlete) {
+          out.push({ label: item.shortDisplayName || item.displayName || '', ...item });
+        }
+      });
+      return out;
+    };
 
-    if (normalizedLeaders.length) {
+    const isPtsReb = l => /point|pts/i.test(l.label) || /reb/i.test(l.label);
+    const awayComp = comp.competitors?.find(c => c.homeAway === 'away');
+    const homeComp = comp.competitors?.find(c => c.homeAway === 'home');
+    const awayNorm = normalizeLeaders(awayComp?.leaders);
+    const homeNorm = normalizeLeaders(homeComp?.leaders);
+    const compNorm = normalizeLeaders(comp.leaders);
+
+    // Best pts/reb leader from each team (fallback to any leader)
+    const bestFrom = leaders => leaders.find(isPtsReb) || leaders[0] || null;
+    const awayTop = bestFrom(awayNorm);
+    const homeTop = bestFrom(homeNorm);
+
+    // Build final list: 1 from each team guaranteed, then fill to 3 from remainder
+    const shown = [];
+    const shownIds = new Set();
+    const tryAdd = l => {
+      if (!l?.athlete?.id || shownIds.has(l.athlete.id)) return;
+      shown.push(l);
+      shownIds.add(l.athlete.id);
+    };
+    tryAdd(awayTop);
+    tryAdd(homeTop);
+    [...awayNorm, ...homeNorm, ...compNorm].forEach(l => {
+      if (shown.length < 3 && isPtsReb(l)) tryAdd(l);
+    });
+
+    if (shown.length) {
       const performersDiv = document.createElement('div');
       performersDiv.className = 'top-performers';
 
-      // Dedupe by athlete id
-      const seen = new Set();
-      const unique = normalizedLeaders.filter(l => {
-        const id = l.athlete?.id;
-        if (!id || seen.has(id)) return false;
-        seen.add(id);
-        return true;
-      });
-
-      const filtered = unique.filter(l => /point|pts/i.test(l.label) || /reb/i.test(l.label));
-
-      filtered.slice(0, 2).forEach(category => {
+      shown.forEach(category => {
         const leader = category;
         const athlete = leader?.athlete;
         if (!athlete) return;
