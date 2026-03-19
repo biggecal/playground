@@ -1605,7 +1605,7 @@ function resetScrollers() {
 fetchScores();
 updateClock();
 requestAnimationFrame(tickScroll);
-setInterval(async () => { await fetchScores(); }, 100_000);
+setInterval(async () => { await fetchScores(); }, 10_000);
 setInterval(updateClock, 1_000);
 </script>
 </body>
