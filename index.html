@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BIGGE NCAA MARCH MADNESS SCOREBOARD</title>
+  <title>BIGGE MARCH MADNESS SCOREBOARD</title>
   <style>
     :root {
       --bg: #0a0e1a;
@@ -793,8 +793,8 @@
 
     <header>
       <div class="header-left">
-        <div class="logo-badge">BIGGE BRACKETS</div>
-        <h1> March Madness &mdash; Live Scoreboard</h1>
+        <img src="logo.png" alt="Bigge Logo" style="height: clamp(24px, 3.5vh, 48px); filter: brightness(0) invert(1);">
+        <div class="logo-badge">MARCH MADNESS BRACKETS</div>
       </div>
       <div class="header-right">
         <span id="live-indicator" class="live-dot" style="display:none">LIVE</span>
@@ -878,7 +878,7 @@ function fmtDate(iso) {
 function getStatusGroup(event) {
   const comp = event.competitions?.[0];
   const type = comp?.status?.type?.name || '';
-  if (type.includes('IN_PROGRESS')) return 'live';
+  if (type.includes('IN_PROGRESS') || type.includes('HALFTIME')) return 'live';
   if (type.includes('FINAL') || type.includes('POSTGAME')) return 'final';
   return 'upcoming';
 }
