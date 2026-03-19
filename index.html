@@ -1492,7 +1492,7 @@ function render(data, tomorrowEvents) {
   document.getElementById('ticker-text').textContent = allNames.join('   ·   ') || 'No games today';
 
   // Header date
-  document.getElementById('header-date').textContent = fmtDate(data.day?.date || new Date().toISOString());
+  document.getElementById('header-date').textContent = fmtDate(new Date().toISOString());
 }
 
 // ── Fetch loop ─────────────────────────────────────────────────────────────
