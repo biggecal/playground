@@ -72,6 +72,7 @@
 
     .logo-badge {
       background: var(--accent);
+      color: #fff;
       border-radius: 0.5vw;
       padding: 0.4vh 0.8vw;
       font-size: clamp(10px, 1.1vw, 18px);
@@ -159,7 +160,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: var(--muted);
+      color: #fff;
     }
 
     .count-badge {
@@ -331,8 +332,8 @@
       height: clamp(14px, 1.4vw, 22px);
       padding: 0 0.25vw;
       border-radius: 0.25vw;
-      background: var(--surface2);
-      border: 1px solid rgba(255,255,255,0.25);
+      background: var(--accent);
+      border: 1px solid var(--accent);
       font-size: clamp(7px, 0.65vw, 11px);
       font-weight: 800;
       color: #fff;
@@ -515,10 +516,24 @@
       font-weight: 600;
     }
 
+    #final-panel .seed-badge {
+      min-width: clamp(18px, 2vw, 30px);
+      height: clamp(18px, 2vw, 30px);
+      font-size: clamp(10px, 1vw, 16px);
+    }
+
+    #final-panel .team-name {
+      font-size: clamp(13px, 1.4vw, 22px);
+    }
+
     #upcoming-panel .seed-badge {
-      min-width: clamp(16px, 1.65vw, 26px);
-      height: clamp(16px, 1.65vw, 26px);
-      font-size: clamp(8px, 0.78vw, 13px);
+      min-width: clamp(18px, 2vw, 30px);
+      height: clamp(18px, 2vw, 30px);
+      font-size: clamp(10px, 1vw, 16px);
+    }
+
+    #upcoming-panel .team-name {
+      font-size: clamp(13px, 1.4vw, 22px);
     }
 
     .upcoming-vs {
@@ -665,7 +680,7 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .empty { color: var(--muted); font-size: clamp(9px, 0.85vw, 14px); padding: 2vh 0; text-align: center; }
+    .empty { color: var(--muted); font-size:25px; padding: 2vh 0; text-align: center; }
 
     /* ── Live panel: expand cards to fill available height (max 5 games) ── */
     #live-panel {
@@ -1424,7 +1439,7 @@ const MOCK_LIVE_GAMES = [
 
 // ── Render ─────────────────────────────────────────────────────────────────
 
-function render(data, tomorrowEvents) {
+function render(data, tomorrowEvents, yesterdayEvents = []) {
   const events = data.events || [];
 
   const live = PREVIEW_LIVE ? MOCK_LIVE_GAMES : events.filter(e => getStatusGroup(e) === 'live');
@@ -1433,7 +1448,6 @@ function render(data, tomorrowEvents) {
 
   // Counts
   document.getElementById('live-count').textContent = live.length;
-  document.getElementById('final-count').textContent = final.length;
   const seenIdsCount = new Set();
   const totalUpcoming = [...upcoming, ...tomorrowEvents].filter(e => {
     if (seenIdsCount.has(e.id)) return false;
@@ -1456,14 +1470,23 @@ function render(data, tomorrowEvents) {
     live.forEach(e => livePanel.appendChild(buildGameCard(e, 'live')));
   }
 
-  // Final panel
+  // Final panel — fall back to yesterday's finals if today has none
   const finalPanel = document.getElementById('final-panel');
   finalPanel.innerHTML = '';
-  if (final.length === 0) {
+  const yesterdayFinals = yesterdayEvents.filter(e => getStatusGroup(e) === 'final');
+  const finalGames = final.length > 0 ? final : yesterdayFinals;
+  if (finalGames.length === 0) {
     finalPanel.innerHTML = '<div class="empty">No completed games yet</div>';
   } else {
-    final.forEach(e => finalPanel.appendChild(buildGameCard(e, 'final')));
+    if (final.length === 0 && yesterdayFinals.length > 0) {
+      const label = document.createElement('div');
+      label.style.cssText = 'padding:0.4vh 1vw;font-size:clamp(8px,0.8vw,13px);color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;';
+      label.textContent = "Yesterday's Results";
+      finalPanel.appendChild(label);
+    }
+    finalGames.forEach(e => finalPanel.appendChild(buildGameCard(e, 'final')));
   }
+  document.getElementById('final-count').textContent = finalGames.length;
 
   // Upcoming panel
   const upcomingPanel = document.getElementById('upcoming-panel');
@@ -1512,16 +1535,24 @@ function tomorrowDateStr() {
   return d.toISOString().slice(0, 10).replace(/-/g, '');
 }
 
+function yesterdayDateStr() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().slice(0, 10).replace(/-/g, '');
+}
+
 async function fetchScores() {
   try {
-    const [todayRes, tomorrowRes] = await Promise.all([
+    const [todayRes, tomorrowRes, yesterdayRes] = await Promise.all([
       fetch(`${API_BASE}?dates=${todayDateStr()}&_=${Date.now()}`),
       fetch(`${API_BASE}?dates=${tomorrowDateStr()}&_=${Date.now()}`),
+      fetch(`${API_BASE}?dates=${yesterdayDateStr()}&_=${Date.now()}`),
     ]);
     if (!todayRes.ok) throw new Error(todayRes.status);
     const data = await todayRes.json();
     const tomorrowData = tomorrowRes.ok ? await tomorrowRes.json() : { events: [] };
-    render(data, tomorrowData.events || []);
+    const yesterdayData = yesterdayRes.ok ? await yesterdayRes.json() : { events: [] };
+    render(data, tomorrowData.events || [], yesterdayData.events || []);
     const t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
     document.getElementById('last-refresh').textContent = `Updated ${t}`;
   } catch (err) {
